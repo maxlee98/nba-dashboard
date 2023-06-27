@@ -1,5 +1,6 @@
 
 import streamlit as st
+import time
 import altair as alt
 import requests
 from urllib.request import Request, urlopen
@@ -69,6 +70,7 @@ def getTeamNames():
     return pd.DataFrame(teams.get_teams())['full_name']
 
 def getAllTeamMetrics(season_selector):
+    time.sleep(0.6)
     teamMetrics = teamestimatedmetrics.TeamEstimatedMetrics(league_id='00', season=season_selector, season_type='Regular Season')
     teamMetrics_df = teamMetrics.get_data_frames()[0]
     teamMetrics_df = teamMetrics_df.drop(['TEAM_ID'], axis=1)

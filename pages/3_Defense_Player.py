@@ -1,5 +1,6 @@
 
 import streamlit as st
+import time
 import requests
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
@@ -42,17 +43,21 @@ def getTeamNames():
     return pd.DataFrame(teams.get_teams())['full_name']
 
 def getPlayersName(team, season='2022-23'):
+    time.sleep(0.6)
     all_teams = teams.get_teams()
     all_teams_df = pd.DataFrame(all_teams)
     abb_t = all_teams_df.loc[all_teams_df['full_name'] == team, 'abbreviation'].item()
     # Find the team by its abbreviation
+    time.sleep(0.6)
     team_info = teams.find_team_by_abbreviation(abb_t)
 
     # Retrieve the team ID
     team_id = team_info['id']
+    time.sleep(0.6)
     roster = commonteamroster.CommonTeamRoster(team_id=team_id, season=season)
     roster = roster.get_data_frames()[0]['PLAYER']
 
+    time.sleep(0.6)
     player_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=season, per_mode_detailed='Totals', last_n_games = 82, season_type_all_star = "Playoffs").get_data_frames()[0]
     player_mins = player_stats.loc[(player_stats['TEAM_ID'] == team_id) & (player_stats['MIN'] > 0), ['PLAYER_NAME', 'TEAM_ABBREVIATION', 'GP', 'MIN']].sort_values('MIN', ascending=False)
     
@@ -60,16 +65,20 @@ def getPlayersName(team, season='2022-23'):
 
 
 def getDefenderList(player_name, season = "2022-23", game_type = "Regular Season"):
+    time.sleep(0.6)
     p_id = players.find_players_by_full_name(player_name)[0]['id']
+    time.sleep(0.6)
     matchups = leagueseasonmatchups.LeagueSeasonMatchups(league_id = "00", 	per_mode_simple = "PerGame", season = season, season_type_playoffs = game_type, off_player_id_nullable = p_id).get_data_frames()[0]
     return matchups['DEF_PLAYER_NAME']
 
 @st.cache_data
 def getDefenseBoxScore(player_name1, player_name2, seasons = ['2022-23'], game_type="Regular Season"):
+    time.sleep(0.6)
     p_id1, p_id2 = players.find_players_by_full_name(player_name1)[0]['id'], players.find_players_by_full_name(player_name2)[0]['id']
     cat_pvp = []
     for s in seasons:
         try:
+            time.sleep(0.6)
             pvp_s = leagueseasonmatchups.LeagueSeasonMatchups(league_id = "00", per_mode_simple = "PerGame", season = s, season_type_playoffs = game_type, off_player_id_nullable = p_id1, def_player_id_nullable = p_id2).get_data_frames()[0]
             pvp_s['SEASON_ID'] = s
             cat_pvp.append(pvp_s)
