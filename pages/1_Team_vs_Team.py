@@ -2,9 +2,7 @@
 import streamlit as st
 import time
 import altair as alt
-import requests
-from urllib.request import Request, urlopen
-from urllib.error import URLError, HTTPError
+from urllib.error import URLError
 import pandas as pd
 import numpy as np
 from nba_api.stats.static import teams
@@ -70,7 +68,7 @@ def getTeamNames():
     return pd.DataFrame(teams.get_teams())['full_name']
 
 def getAllTeamMetrics(season_selector):
-    time.sleep(0.6)
+    time.sleep(1)
     teamMetrics = teamestimatedmetrics.TeamEstimatedMetrics(league_id='00', season=season_selector, season_type='Regular Season')
     teamMetrics_df = teamMetrics.get_data_frames()[0]
     teamMetrics_df = teamMetrics_df.drop(['TEAM_ID'], axis=1)

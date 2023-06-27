@@ -1,4 +1,4 @@
-
+import time
 import streamlit as st
 import requests
 from urllib.request import Request, urlopen
@@ -9,16 +9,9 @@ import numpy as np
 from nba_api.stats.endpoints import playergamelog
 from nba_api.stats.static import players
 from nba_api.stats.static import teams
-from nba_api.stats.endpoints import commonallplayers
-from nba_api.stats.endpoints import commonplayerinfo
 from nba_api.stats.endpoints import commonteamroster
 from nba_api.stats.static import teams
-from nba_api.stats.endpoints import playervsplayer
-from nba_api.stats.endpoints import boxscoredefensive
-from nba_api.stats.endpoints import boxscoreplayertrackv2
 from nba_api.stats.endpoints import leaguedashplayerstats
-from nba_api.stats.endpoints import playbyplay
-from nba_api.stats.endpoints import leagueseasonmatchups
 from nba_api.stats.endpoints import playerdashboardbyshootingsplits
 
 fl_name = __file__.split("\\")[-1].split(".")[0]
@@ -46,9 +39,11 @@ def getPlayerBoxScore(player_name, last_n_games, season = "2022-23", game_type =
     use_cols = ['GAME_DATE', 'MATCHUP', 'WL', 'MIN', 'FGM', 'FGA', 'FG_PCT', 'FG3M', 'FG3A', 'FG3_PCT', 'FTM', 'FTA', 'FT_PCT', 'OREB', 'DREB', 'REB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS', 'PLUS_MINUS']
 
     print("Processing Player : {}".format(player_name))
+    time.sleep(1)
     p_id = players.find_players_by_full_name(player_name)[0]['id']
     # print("Player : {} \t Player_ID = {}".format(p, player_id))
     try:
+        time.sleep(1)
         p_log = playergamelog.PlayerGameLog(player_id=p_id, season_type_all_star=game_type, timeout=10).get_data_frames()[0][:last_n_games]
         print(len(p_log))
         if len(p_log) > 0:
@@ -63,8 +58,9 @@ def getPlayerBoxScore(player_name, last_n_games, season = "2022-23", game_type =
     return p_log_gs
 
 def getPlayerShootingChart(player_name, last_n_games, season="2022-23", game_type="Regular Season"):
+    time.sleep(1)
     p_id = players.find_players_by_full_name(player_name)[0]['id']
-
+    time.sleep(1)
     playerShootingSplits = playerdashboardbyshootingsplits.PlayerDashboardByShootingSplits(last_n_games=last_n_games, measure_type_detailed="Base", month=0, opponent_team_id=0, pace_adjust="N", 
                                             per_mode_detailed="PerGame", period=0, player_id=p_id, plus_minus="N", rank="N", season=season, season_type_playoffs=game_type,
                                             vs_division_nullable=None, vs_conference_nullable=None, season_segment_nullable=None, outcome_nullable=None,
@@ -77,20 +73,24 @@ def getPlayerShootingChart(player_name, last_n_games, season="2022-23", game_typ
 
 def getTeamNames():
 # Get all the teams and their information
+    time.sleep(1)
     return pd.DataFrame(teams.get_teams())['full_name']
 
 def getPlayersName(team, season='2022-23'):
+    time.sleep(1)
     all_teams = teams.get_teams()
     all_teams_df = pd.DataFrame(all_teams)
     abb_t = all_teams_df.loc[all_teams_df['full_name'] == team, 'abbreviation'].item()
     # Find the team by its abbreviation
+    time.sleep(1)
     team_info = teams.find_team_by_abbreviation(abb_t)
 
     # Retrieve the team ID
     team_id = team_info['id']
+    time.sleep(1)
     roster = commonteamroster.CommonTeamRoster(team_id=team_id, season=season)
     roster = roster.get_data_frames()[0]['PLAYER']
-
+    time.sleep(1)
     player_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=season, per_mode_detailed='Totals', last_n_games = 82, season_type_all_star = "Playoffs").get_data_frames()[0]
 
     player_mins = player_stats.loc[(player_stats['TEAM_ID'] == team_id) & (player_stats['MIN'] > 0), ['PLAYER_NAME', 'TEAM_ABBREVIATION', 'GP', 'MIN']].sort_values('MIN', ascending=False)
